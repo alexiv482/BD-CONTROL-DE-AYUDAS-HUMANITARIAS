@@ -1,49 +1,128 @@
-# BASE DE DATOS PARA AYUDAS HUMANITARIAS
-Esta base de Datos SQL tiene como objetivo hacer Control y Seguimiento a la entrega de ayudas humanitarias ante desastres naturales como un terremoto.
+## Sebastian Ramirez Ramos.
+## Wainer Jesus Angulo Panameño.
+## Sandra Nahomy Castro Olaya
+## Erika Alexandra Estupiñan Valenzuela
 
-La base de datos permite registrar hogares afectados, identificar sus necesidades, recibir donaciones, controlar la disponibilidad de las ayudas y dejar constancia de las entregas de estas.
+## 1. Introducción
 
-## Aspectos Técnicos.
-1. **Manejo de Prioridad en Entregas.**
-  Se decidió como equipo manejar las prioridades de la siguiente manera:
+Durante el desarrollo del taller **Operación Marea Alta**, el equipo
+trabajó en una propuesta de base de datos para organizar la información
+relacionada con los hogares afectados por la emergencia, sus
+necesidades, las donaciones recibidas y la entrega de ayudas
+humanitarias.
 
-   1. ***Condición Especial***: Los hogares que presenten alguna condición especial, son los de la mas alta prioridad.
-   
-      *Clasificación*: Gestantes, Niños, Ancianos y Discapacitados.
+Para construir el modelo se realizaron discusiones grupales y se tomaron
+decisiones sobre la forma de organizar la información. Estas decisiones
+se reflejan tanto en el diagrama entidad-relación como en las reglas que
+el equipo propuso para ordenar la atención de los hogares.
 
-      *Orden de Prioridad*: 1) Gestantes - 2) Niños - 3) Personas Discapacitadas - 4) Ancianos
+En este documento se explican  las principales decisiones del equipo,
+teniendo en cuenta el enunciado y el diagrama elaborado.
 
-   2. ***Tipo de Necesidad***: Los hogares manifiestan su necesidad para así poder brindarles la ayuda humanitaria necesaria.
+## Decisiones tomadas en el diseño del diagrama
 
-      *Clasificación*: Alimentaria, Refugio Temporal, Agua, Aseo y Medicamentos.
+## 1. Diseño del diagrama
 
-      *Orden de Prioridad*: 1) Refugio - 2) Agua - 3) Alimentación - 4) Medicamento - 5) Aseo
+### Separar las condiciones de prioridad y las necesidades del hogar
+Esta desición, se toma teniendo en cuenta que un hogar puede tener varias
+condiciones de prioridad y varias necesidades, de esta manera se garantiza
+que el diseño permita a cada hogar la seleccion de muchas necesidades y condiciones
+de prioridad.
 
-   3. ***Sistema de Puntuaciones***: Las categorías anteriores contarán con puntos, donde la mayor prioridad obtendrá el número mas alto y la menor el más bajo.
 
-   4. ***Desempates***: En el caso de que dos o mas hogares cuenten con la misma puntuación, se usara el modelo de primeros en entrar primeros en salir para así terminar de organizar la lista de entregas pendientes.
+### Crear una tabla para la persona de contacto
+En el diagrama se creó la tabla persona_contacto, separada de la tabla
+hogar. Allí se guardan los datos personales y de contacto de quien
+representa al hogar, como nombres, apellidos, tipo y número de documento
+y teléfono.
 
-1. **Modelo Entidad Relación.**
+Se tomó esta decisión porque la persona de contacto y el hogar
+representan información diferente. El hogar reúne los datos sobre la
+familia y su situación, mientras que la persona de contacto permite
+identificar con quien puede comunicarse con el equipo encargado de la
+operación.
 
-  ![Modelo Entidad Relación](./Docs/MER-INICIAL.svg)
+Separar estas tablas facilita organizar la información y
+modificar los datos de contacto sin tener que alterar los demás datos
+del hogar. 
 
-3. **Resolución de Reglas.**
+### Separar la ubicación del hogar
+También se creó la tabla ubicacion, relacionada con hogar mediante
+id_ubicacion. Esta tabla contempla campos como barrio, corregimiento,
+vereda, comunidad y referencia de ubicación.
 
-      Código: Condición verificable.
-- [ ] R-01: Cada hogar tiene un identificador estable, aunque cambie su lugar temporal de permanencia.
-- [ ] R-02: Un hogar puede reportar distintos tipos de necesidad.
-- [ ] R-03: Un tipo de necesidad puede aparecer en los reportes de muchos hogares.
-- [ ] R-04: El reporte debe conservar datos propios de la relación, como urgencia, cantidad estimada, estado y observación.
-- [ ] R-05: Un donante puede realizar varias donaciones.
-- [ ] R-06: Una donación puede incluir distintos tipos de ayuda, cada uno con cantidad y unidad de medida.
-- [ ] R-07: El mismo tipo de ayuda puede aparecer en distintas donaciones.
-- [ ] R-08: Un hogar puede recibir varias entregas en momentos diferentes.
-- [ ] R-09: Cada entrega ocurre en un solo punto de atención, pero un punto registra muchas entregas.
-- [ ] R-10: Una entrega puede incluir varios tipos de ayuda y un tipo de ayuda puede aparecer en muchas entregas.
-- [ ] R-11: La cantidad entregada pertenece al detalle de la entrega, no al hogar ni al tipo de ayuda.
-- [ ] R-12: Debe diferenciarse la fecha de entrega de la fecha de registro en el sistema.
-- [ ] R-13: Cada tipo de ayuda debe tener una unidad de medida estándar, usada tanto en las entradas como en las entregas.
-- [ ] R-14: Una entrega confirmada no puede dejar el inventario con saldo negativo.
-- [ ] R-15: Una persona usuaria puede tener varias funciones y una función puede corresponder a varias personas.
-- [ ] R-16: La asignación de una función debe poder activarse o finalizar sin eliminar a la persona ni la función.
-- [ ] R-17: Toda cantidad debe ser mayor que cero y expresarse en la unidad definida para ese tipo de ayuda.
+La decisión se tomó porque Buenaventura tiene sectores urbanos y
+rurales, y no todos los hogares pueden identificarse mediante una
+dirección convencional. Por ejemplo, en una zona rural puede ser más
+útil registrar la vereda o una referencia que permita encontrar el
+lugar.
+
+Al separar la ubicación, se evita mezclar estos datos con la información
+general del hogar y se facilita consultar los hogares según el sector
+donde se encuentran.
+
+### Crear una tabla para los hogares pendientes
+En el diagrama se incluyó la tabla pendiente, relacionada con
+reporte, y con el campo nivel_urgencia. La intención es identificar
+los reportes que todavía requieren atención y tener una referencia para
+organizar cuáles deben ser atendidos primero.
+
+Un registro en pendiente representa únicamente un reporte que aún
+necesita atención y este se retira cuando su estado cambie.
+
+### Registrar la selección de las ayudas
+La tabla seleccion_ayuda relaciona un registro pendiente con un
+elemento del inventario y guarda una cantidad. Con esta estructura, el
+equipo busca representar qué ayuda se selecciona para atender una
+necesidad y en qué cantidad expecífica.
+
+Esta decisión permite relacionar las necesidades de los hogares con los recursos
+disponibles. Por ejemplo, si un hogar tiene pendiente una
+necesidad de agua, se puede seleccionar una cantidad de agua del
+inventario para atenderla.
+
+### 2. Prioridad según las condiciones del hogar
+Se decidió dar mayor prioridad a los hogares que presenten alguna de
+estas condiciones:
+
+-   Mujeres gestantes.
+-   Niños.
+-   Personas con discapacidad o movilidad reducida.
+-   Personas mayores.
+
+El orden propuesto por el equipo es:
+
+1.  Mujeres gestantes.
+2.  Niños.
+3.  Personas con discapacidad.
+4.  Personas mayores.
+
+La idea es reconocer que algunas condiciones pueden hacer que un hogar
+necesite atención especial. Sin embargo, este orden debe entenderse como
+un criterio inicial del equipo y no como una regla que aplique de la
+misma manera a todas las situaciones.
+
+
+
+### Prioridad según el tipo de necesidad
+También se propuso ordenar las necesidades de acuerdo con su categoría:
+
+1.  Refugio temporal.
+2.  Agua potable.
+3.  Alimentación.
+4.  Medicamentos.
+5.  Elementos de aseo.
+
+Este orden busca dar una orientación general sobre cuáles necesidades
+deberían atenderse primero. Aunque la categoría no debe confundirse
+con la urgencia de un caso particular, porque na solicitud de medicamentos
+podría ser urgente dependiendo de la situación del hogar.
+
+Por eso, se considera importante conservar el tipo de necesidad y su
+nivel de urgencia como datos diferentes.
+
+### Sistema de puntuación
+Para combinar los criterios anteriores, el equipo propuso asignar puntos
+a las condiciones del hogar y a los tipos de necesidad. Las categorías
+consideradas más prioritarias recibirían una puntuación mayor y las de
+menor prioridad una puntuación inferior, este sistema permitiría ordenar los casos de una manera más clara.
