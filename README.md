@@ -61,25 +61,12 @@ Al separar la ubicación, se evita mezclar estos datos con la información
 general del hogar y se facilita consultar los hogares según el sector
 donde se encuentran.
 
-### Crear una tabla para los hogares pendientes
-En el diagrama se incluyó la tabla pendiente, relacionada con
-reporte, y con el campo nivel_urgencia. La intención es identificar
-los reportes que todavía requieren atención y tener una referencia para
-organizar cuáles deben ser atendidos primero.
-
-Un registro en pendiente representa únicamente un reporte que aún
-necesita atención y este se retira cuando su estado cambie.
-
 ### Registrar la selección de las ayudas
-La tabla seleccion_ayuda relaciona un registro pendiente con un
-elemento del inventario y guarda una cantidad. Con esta estructura, el
-equipo busca representar qué ayuda se selecciona para atender una
-necesidad y en qué cantidad expecífica.
+Esta tabla se conecta con el inventario y el reporte, para garantizar que la ayudas sean
+escogidas de acuerdo con la necesidad de hogar. El inventario cuenta con el atributo
+"disponible", que en caso de que su valor sea true, significaría que si se puede llevar seleccionar
+y se puede llevar a cabo al entrega.
 
-Esta decisión permite relacionar las necesidades de los hogares con los recursos
-disponibles. Por ejemplo, si un hogar tiene pendiente una
-necesidad de agua, se puede seleccionar una cantidad de agua del
-inventario para atenderla.
 
 ### 2. Prioridad según las condiciones del hogar
 Se decidió dar mayor prioridad a los hogares que presenten alguna de
